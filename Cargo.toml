@@ -1,6 +1,6 @@
 [package]
 name = "handlemap"
-description = "A collection that produces handles that can be used as keys to retrieve the stored items"
+description = "A collection that produces handles that can be used as keys to retrieve the stored items."
 repository = "https://github.com/rhedgeco/handlemap"
 version = "0.1.0"
 edition = "2021"
