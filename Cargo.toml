@@ -4,5 +4,5 @@ description = "A collection that produces handles that can be used as keys to re
 repository = "https://github.com/rhedgeco/handlemap"
 version = "0.1.0"
 edition = "2021"
-license = "LICENSE.md"
+license = "MIT"
 readme = "README.md"
