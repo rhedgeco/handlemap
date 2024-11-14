@@ -2,7 +2,7 @@
 name = "handlemap"
 description = "A collection that produces handles that can be used as keys to retrieve the stored items."
 repository = "https://github.com/rhedgeco/handlemap"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
