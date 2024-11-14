@@ -78,6 +78,26 @@ impl<T> DenseHandleMap<T> {
         handle
     }
 
+    /// Predicts the next handle that will be generated.
+    ///
+    /// This is just an alias for [`predict_handle(0)`](Self::predict_handle).
+    ///
+    /// # Panics
+    /// This function will panic if the predicted capacity exceeds `u32::MAX`
+    pub fn predict_next_handle(&self) -> Handle<T> {
+        self.predict_handle(0)
+    }
+
+    /// Predicts the handle that will be generated after inserting `count` values.
+    ///
+    /// This is only accurate for multiple inserts. Once a single removal is made, this prediction can de-sync.
+    ///
+    /// # Panics
+    /// This function will panic if the predicted capacity exceeds `u32::MAX`
+    pub fn predict_handle(&self, count: usize) -> Handle<T> {
+        self.link.predict_handle(count).cast()
+    }
+
     /// Removes the value associated with `handle` from the map.
     ///
     /// Returns `None` if the value does not exist.

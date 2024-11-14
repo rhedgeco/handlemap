@@ -76,10 +76,42 @@ impl<T> SparseHandleMap<T> {
         option.as_mut()
     }
 
+    /// Predicts the next handle that will be generated.
+    ///
+    /// This is just an alias for [`predict_handle(0)`](Self::predict_handle).
+    ///
+    /// # Panics
+    /// This function will panic if the predicted capacity exceeds `u32::MAX`
+    pub fn predict_next_handle(&self) -> Handle<T> {
+        self.predict_handle(0)
+    }
+
+    /// Predicts the handle that will be generated after inserting `count` values.
+    ///
+    /// This is only accurate for multiple inserts. Once a single removal is made, this prediction can de-sync.
+    ///
+    /// # Panics
+    /// This function will panic if the predicted capacity exceeds `u32::MAX`
+    pub fn predict_handle(&self, count: usize) -> Handle<T> {
+        // first check if there will be existing handles re-used
+        if let Some(index) = self.available.get(count) {
+            let (handle, _) = &self.values[*index];
+            return Handle::from_parts(handle.meta().wrapping_add(1), handle.index());
+        }
+
+        // otherwise generate the next new handle
+        let new_count = count - self.available.len();
+        let new_index = self.values.len() + new_count;
+        match new_index <= u32::MAX as usize {
+            true => Handle::from_parts(0, new_index as u32),
+            false => panic!("capacity overflow"),
+        }
+    }
+
     /// Inserts `value` into the map, returning a [`Handle`] to its location.
     ///
     /// # Panics
-    /// Panics if the new capacity exceeds `u32::MAX` bytes.
+    /// Panics if the new capacity exceeds `u32::MAX`
     pub fn insert(&mut self, value: T) -> Handle<T> {
         if let Some(index) = self.available.pop_front() {
             let (handle, option) = &mut self.values[index];
@@ -89,13 +121,14 @@ impl<T> SparseHandleMap<T> {
         }
 
         let new_index = self.values.len();
-        if new_index > u32::MAX as usize {
-            panic!("capacity overflow");
+        match new_index <= u32::MAX as usize {
+            false => panic!("capacity overflow"),
+            true => {
+                let handle = Handle::from_parts(0, new_index as u32);
+                self.values.push((handle, Some(value)));
+                handle
+            }
         }
-
-        let handle = Handle::from_parts(0, new_index as u32);
-        self.values.push((handle, Some(value)));
-        handle
     }
 
     /// Removes the value associated with `handle` from the map.
