@@ -44,6 +44,11 @@ impl<T> SparseHandleMap<T> {
         self.values.len() - self.available.len()
     }
 
+    /// Returns the total number of values in the map including gap values
+    pub fn sparse_len(&self) -> usize {
+        self.values.len()
+    }
+
     /// Returns the total number of elements the map can hold without reallocating.
     pub fn capacity(&self) -> usize {
         self.values.capacity()
@@ -65,6 +70,13 @@ impl<T> SparseHandleMap<T> {
         option.as_ref()
     }
 
+    /// Returns a reference to the value located at `index`
+    ///
+    /// Returns `None` if no value exists in this slot
+    pub fn get_index(&self, index: usize) -> Option<&T> {
+        self.values.get(index)?.1.as_ref()
+    }
+
     /// Returns a mutable reference to the value associated with `handle`.
     ///
     /// Returns `None` if the value does not exist.
@@ -74,6 +86,13 @@ impl<T> SparseHandleMap<T> {
             return None;
         }
         option.as_mut()
+    }
+
+    /// Returns a reference to the value located at `index`
+    ///
+    /// Returns `None` if no value exists in this slot
+    pub fn get_index_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.values.get_mut(index)?.1.as_mut()
     }
 
     /// Predicts the next handle that will be generated.
